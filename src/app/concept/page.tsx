@@ -105,7 +105,7 @@ export default function ConceptPage() {
                   {hp === true ? (
                     <Check className="h-4 w-4 text-primary" />
                   ) : (
-                    <span className="text-xs text-primary font-medium">{hp as string}</span>
+                    <span className="text-xs text-primary font-medium">{String(hp)}</span>
                   )}
                 </div>
               </div>
