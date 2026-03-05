@@ -1,36 +1,140 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Housespark – MVP
 
-## Getting Started
+Webapp de réservation de villas de groupe (jusqu'à 45 personnes).
 
-First, run the development server:
+## Stack technique
+
+- **Framework** : Next.js 15 (App Router) + TypeScript
+- **Style** : Tailwind CSS v4
+- **Auth / DB / Storage** : Supabase
+- **Emails** : Resend
+- **Icônes** : Lucide React
+- **Déploiement** : Vercel
+
+## Pré-requis
+
+- Node.js 20+
+- Compte Supabase (gratuit)
+- Compte Resend (gratuit, optionnel pour emails)
+
+## Installation
+
+```bash
+cd housespark-app
+npm install
+```
+
+## Configuration
+
+1. **Créer un projet Supabase** sur [supabase.com](https://supwabase.com)
+
+2. **Copier le fichier d'environnement** :
+```bash
+cp .env.example .env.local
+```
+
+3. **Remplir les variables** dans `.env.local` :
+```
+NEXT_PUBLIC_SUPABASE_URL=https://votre-projet.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-anon-key
+SUPABASE_SERVICE_ROLE_KEY=votre-service-role-key
+RESEND_API_KEY=re_votre_clé  # optionnel
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+4. **Initialiser la base de données** :
+   - Aller dans le SQL Editor de Supabase
+   - Exécuter `supabase/schema.sql` (crée les tables et les policies RLS)
+   - Exécuter `supabase/seed.sql` (insère 6 villas d'exemple + extras)
+
+5. **Créer un utilisateur admin** :
+   - S'inscrire normalement sur l'app
+   - Dans Supabase > Table Editor > `profiles`, changer le `role` de votre user en `admin`
+
+## Lancement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+L'app sera accessible sur [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Structure du projet
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── page.tsx                 # Accueil
+│   ├── concept/page.tsx         # Le concept
+│   ├── activites/page.tsx       # Activités
+│   ├── villas/
+│   │   ├── page.tsx             # Catalogue + filtres
+│   │   └── [slug]/page.tsx      # Détail villa
+│   ├── booking/
+│   │   ├── recap/page.tsx       # Récapitulatif réservation
+│   │   └── merci/page.tsx       # Confirmation
+│   ├── login/page.tsx           # Connexion
+│   ├── register/page.tsx        # Inscription
+│   ├── account/page.tsx         # Mon compte
+│   ├── admin/
+│   │   ├── page.tsx             # Dashboard admin
+│   │   ├── villas/              # CRUD villas
+│   │   ├── extras/              # CRUD extras
+│   │   └── bookings/            # Liste réservations
+│   └── api/
+│       └── bookings/route.ts    # API création réservation
+├── components/
+│   ├── layout/                  # Header, Footer
+│   ├── ui/                      # Button, Input
+│   ├── villas/                  # VillaCard, PhotoCarousel, etc.
+│   ├── booking/                 # BookingForm
+│   ├── auth/                    # LogoutButton
+│   └── admin/                   # VillaForm, ExtrasClient
+├── lib/
+│   ├── supabase/                # Client, Server, Middleware
+│   ├── types.ts                 # Types TypeScript
+│   └── utils.ts                 # Utilitaires
+└── middleware.ts                # Auth middleware
+```
 
-## Learn More
+## Base de données
 
-To learn more about Next.js, take a look at the following resources:
+Le schéma est dans `supabase/schema.sql`. Tables :
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **profiles** : Utilisateurs (extends auth.users)
+- **villas** : Propriétés
+- **villa_photos** : Photos des villas
+- **extras** : Services additionnels
+- **villa_extras** : Relation villas ↔ extras
+- **bookings** : Réservations
+- **booking_extras** : Extras d'une réservation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Seed data
 
-## Deploy on Vercel
+6 villas d'exemple :
+- Villa Sunrise – Côte d'Azur
+- Mas des Oliviers – Provence
+- Chalet Grand Massif – Alpes
+- Domaine de la Plage – Landes
+- Bastide Royale – Périgord
+- Villa Porto-Vecchio – Corse
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+6 extras :
+- Cours de padel, Karting, Paintball, Chef privé, DJ & sono, Ménage premium
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Déploiement (Vercel)
+
+1. Push sur GitHub
+2. Importer le repo sur [vercel.com](https://vercel.com)
+3. Ajouter les variables d'environnement
+4. Déployer
+
+## Checklist de déploiement
+
+- [ ] Variables d'environnement configurées
+- [ ] Schema SQL exécuté dans Supabase
+- [ ] Seed data inséré
+- [ ] Storage bucket créé (pour upload photos)
+- [ ] Utilisateur admin créé
+- [ ] Domaine Resend vérifié (pour emails prod)
+- [ ] Config CORS Supabase mise à jour avec le domaine de prod

@@ -1,26 +1,188 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  /* Housespark V2 — Green identity #b8cca1 (sage green) */
+  --color-primary: #b8cca1;
+  --color-primary-dark: #8fa978;
+  --color-primary-light: #d4e3c5;
+  --color-primary-text: #5c7a42;
+  --color-primary-forest: #055043;
+  --color-secondary: #055043;
+  --color-secondary-dark: #044039;
+  --color-accent: #F59E0B;
+  --color-dark: #0F0F0F;
+  --color-gray-50: #FAFAFA;
+  --color-gray-100: #F4F4F5;
+  --color-gray-200: #E4E4E7;
+  --color-gray-300: #D4D4D8;
+  --color-gray-400: #A1A1AA;
+  --color-gray-500: #71717A;
+  --color-gray-600: #52525B;
+  --color-gray-700: #3F3F46;
+  --color-gray-800: #1A1A1A;
+  --color-gray-900: #0A0A0A;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply text-dark antialiased;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Minimal scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}
+
+/* Focus ring */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary ring-0;
+}
+
+/* Skeleton loading animation */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 2000px 100%;
+  animation: shimmer 2s infinite ease-in-out;
+  border-radius: 12px;
+}
+
+/* Glass effect for header */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Premium card hover */
+.card-premium {
+  @apply transition-all duration-300 ease-out;
+}
+.card-premium:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(0,0,0,0.08);
+}
+
+/* Smooth image zoom on hover */
+.img-zoom {
+  @apply transition-transform duration-500 ease-out;
+}
+.img-zoom:hover {
+  transform: scale(1.05);
+}
+
+/* Input focus */
+input:focus, select:focus, textarea:focus {
+  transition: all 0.2s ease;
+}
+
+input[type="date"] {
+  @apply appearance-none;
+}
+
+/* Gradient text — green identity */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #0EA5E9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Big statement text */
+.text-statement {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.text-mega {
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+/* Section breathing */
+.section-breathing {
+  padding-top: clamp(4rem, 10vw, 8rem);
+  padding-bottom: clamp(4rem, 10vw, 8rem);
+}
+
+/* Page transition */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Subtle divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-gray-200), transparent);
+}
+
+/* Marquee for infinite scroll text */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* Lights pulsing — Scène 5 homepage */
+@keyframes pulseSlow {
+  0%, 100% { opacity: 0.07; transform: scale(1); }
+  50% { opacity: 0.18; transform: scale(1.08); }
+}
+@keyframes pulseSlower {
+  0%, 100% { opacity: 0.12; transform: scale(1); }
+  50% { opacity: 0.22; transform: scale(1.12); }
+}
+.animate-pulse-slow {
+  animation: pulseSlow 5s ease-in-out infinite;
+}
+.animate-pulse-slower {
+  animation: pulseSlower 8s ease-in-out infinite;
+}
+
+/* Parallax helper */
+.parallax-bg {
+  will-change: transform;
+  transition: transform 0.1s linear;
 }
