@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, Lock, User, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
@@ -9,8 +9,10 @@ import { createClient } from '@/lib/supabase/client';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextUrl = searchParams.get('next') || '/account';
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -53,7 +55,7 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push('/account');
+    router.push(nextUrl);
     router.refresh();
   };
 
@@ -170,11 +172,22 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-gray-400 mt-8">
           Déjà un compte ?{' '}
-          <Link href="/login" className="text-primary font-semibold hover:underline">
+          <Link
+            href={`/login${nextUrl !== '/account' ? `?next=${encodeURIComponent(nextUrl)}` : ''}`}
+            className="text-primary font-semibold hover:underline"
+          >
             Se connecter
           </Link>
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[85vh]" />}>
+      <RegisterForm />
+    </Suspense>
   );
 }

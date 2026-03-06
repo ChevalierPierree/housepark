@@ -16,6 +16,8 @@ interface BookingFormProps {
   extras: Extra[];
 }
 
+const DRAFT_KEY = 'booking_draft';
+
 export default function BookingForm({ villa, extras }: BookingFormProps) {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -29,7 +31,23 @@ export default function BookingForm({ villa, extras }: BookingFormProps) {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => setIsLoggedIn(!!user));
-  }, []);
+
+    // Restaurer le brouillon si on revient après connexion
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (draft.villaId === villa.id) {
+          if (draft.checkInDate) setCheckInDate(new Date(draft.checkInDate));
+          if (draft.checkOutDate) setCheckOutDate(new Date(draft.checkOutDate));
+          if (draft.guests) setGuests(draft.guests);
+          if (draft.selectedExtras) setSelectedExtras(draft.selectedExtras);
+          setStep(3);
+        }
+        sessionStorage.removeItem(DRAFT_KEY);
+      }
+    } catch {}
+  }, [villa.id]);
 
   const startDate = checkInDate ? dateToISO(checkInDate) : '';
   const endDate = checkOutDate ? dateToISO(checkOutDate) : '';
@@ -281,13 +299,37 @@ export default function BookingForm({ villa, extras }: BookingFormProps) {
           <div className="flex-1 flex flex-col gap-2">
             <p className="text-xs text-gray-400 text-center mb-1">Connecte-toi pour finaliser ta réservation</p>
             <button
-              onClick={() => router.push(`/login?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/')}`)}
+              onClick={() => {
+                try {
+                  sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+                    villaId: villa.id,
+                    checkInDate: checkInDate?.toISOString(),
+                    checkOutDate: checkOutDate?.toISOString(),
+                    guests,
+                    selectedExtras,
+                  }));
+                } catch {}
+                const next = encodeURIComponent(`/villas/${villa.slug}`);
+                router.push(`/login?next=${next}`);
+              }}
               className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-dark text-white font-bold rounded-xl hover:bg-gray-800 transition-colors text-sm"
             >
               <LogIn className="h-4 w-4" /> Se connecter
             </button>
             <button
-              onClick={() => router.push(`/register?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/')}`)}
+              onClick={() => {
+                try {
+                  sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+                    villaId: villa.id,
+                    checkInDate: checkInDate?.toISOString(),
+                    checkOutDate: checkOutDate?.toISOString(),
+                    guests,
+                    selectedExtras,
+                  }));
+                } catch {}
+                const next = encodeURIComponent(`/villas/${villa.slug}`);
+                router.push(`/register?next=${next}`);
+              }}
               className="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors text-sm"
             >
               <UserPlus className="h-4 w-4" /> Créer un compte
